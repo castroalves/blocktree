@@ -1,0 +1,16 @@
+{
+	"apiVersion": 2,
+	"name": "castroalves/blocktree",
+	"version": "0.1.0",
+	"title": "Blocktree",
+	"category": "common",
+	"icon": "admin-links",
+	"description": "Build a Linktree-like page with blocks.",
+	"supports": {
+		"html": false
+	},
+	"textdomain": "blocktree",
+	"editorScript": "file:./build/index.js",
+	"editorStyle": "file:./build/index.css",
+	"style": "file:./build/style-index.css"
+}
