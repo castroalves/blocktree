@@ -21,6 +21,8 @@
  * @see https://developer.wordpress.org/block-editor/tutorials/block-tutorial/writing-your-first-block-type/
  */
 
+namespace CastroAlves;
+
 class Blocktree {
 
 	private $backgroundColor;
@@ -94,4 +96,4 @@ class Blocktree {
 	
 }
 
-$blocktree = new Blocktree();
+$blocktree = new Blocktree;
