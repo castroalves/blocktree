@@ -21,45 +21,77 @@
  * @see https://developer.wordpress.org/block-editor/tutorials/block-tutorial/writing-your-first-block-type/
  */
 
-function blocktree_register_block_type() {
+class Blocktree {
 
-	$asset_file = include( plugin_dir_path( __FILE__ ) . 'build/index.asset.php' );
+	private $backgroundColor;
+	private $textColor;
 
-	wp_register_script(
-		'blocktree-script',
-		plugins_url( 'build/index.js', __FILE__ ),
-		$asset_file['dependencies'],
-		$asset_file['version']
-	);
+	public function __construct()
+	{
+		add_action( 'init', [$this, 'blocktree_register_block_type'] );	
+		add_action( 'wp_enqueue_scripts', [$this, 'blocktree_enqueue_scripts'] );
+	}
 
-	register_block_type( 'castroalves/blocktree', [
-		'editor_style' => 'blocktree-styles',
-		'editor_script' => 'blocktree-script',
-		'render_callback' => 'blocktree_render_callback',
-	] );
+	public function blocktree_register_block_type() {
+
+		$asset_file = include( plugin_dir_path( __FILE__ ) . 'build/index.asset.php' );
+
+		wp_register_script(
+			'blocktree-script',
+			plugins_url( 'build/index.js', __FILE__ ),
+			$asset_file['dependencies'],
+			$asset_file['version']
+		);
+
+		register_block_type( 'castroalves/blocktree', [
+			'editor_style' => 'blocktree-styles',
+			'editor_script' => 'blocktree-script',
+			'render_callback' => [$this, 'blocktree_render_callback'],
+		] );
+	}
+	
+
+	public function blocktree_enqueue_scripts() {
+		wp_enqueue_style(
+			'blocktree-styles', 
+			plugin_dir_url(__FILE__) . 'build/style-index.css',
+			['twenty-twenty-one-style']
+		);
+
+		if ($this->backgroundColor && $this->textColor) {
+			$inlineCss = '
+			.blocktree-link-item > a,
+			.blocktree-link-item > a:focus {
+				background-color: ' . $this->backgroundColor . ',
+				color: ' . $this->textColor . ',
+			}
+			';
+	
+			wp_add_inline_style('blocktree-styles', $inlineCss);
+		}
+	}
+
+	public function blocktree_render_callback( $attr ) {
+
+		$this->backgroundColor = $attr['linkBgColor'];
+		$this->textColor = $attr['linkTextColor'];
+
+		$linkTarget = (bool) $attr['linkTarget'] ? 'target="_blank" rel="noopener noreferrer"' : '';
+		$html = '<div class="blocktree-link-item">';
+		$html .= '<a href="'.$attr['linkUrl'].'"'.$linkTarget.'>'.$attr['linkTitle'].'</a>';
+		$html .= '</div>';
+
+		return $html;
+	}
+
+	private function dd( $content ) {
+		echo '<pre>';
+		print_r($content);
+		echo '</pre>';
+		die();
+	}
+
+	
 }
-add_action( 'init', 'blocktree_register_block_type' );
 
-function blocktree_enqueue_scripts() {
-	wp_enqueue_style(
-		'blocktree-styles', 
-		plugin_dir_url(__FILE__) . 'build/style-index.css',
-		['twenty-twenty-one-style']
-	);
-}
-add_action('wp_enqueue_scripts', 'blocktree_enqueue_scripts');
-
-function blocktree_render_callback( $attr ) {
-	$linkTarget = (bool) $attr['linkTarget'] ? 'target="_blank" rel="noopener noreferrer"' : '';
-	$html = '<div class="blocktree-link-item">';
-	$html .= '<a href="'.$attr['linkUrl'].'"'.$linkTarget.'>'.$attr['linkTitle'].'</a>';
-	$html .= '</div>';
-	return $html;
-}
-
-function dd( $content ) {
-	echo '<pre>';
-	print_r($content);
-	echo '</pre>';
-	die();
-}
+$blocktree = new Blocktree();
