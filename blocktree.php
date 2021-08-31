@@ -25,8 +25,7 @@ namespace CastroAlves;
 
 class Blocktree {
 
-	private $backgroundColor;
-	private $textColor;
+	private $item = 0;
 
 	public function __construct()
 	{
@@ -59,32 +58,29 @@ class Blocktree {
 			plugin_dir_url(__FILE__) . 'build/style-index.css',
 			['twenty-twenty-one-style']
 		);
-
-		if ($this->backgroundColor && $this->textColor) {
-			$inlineCss = '
-			.blocktree-link-item > a,
-			.blocktree-link-item > a:focus {
-				background-color: ' . $this->backgroundColor . ',
-				color: ' . $this->textColor . ',
-			}
-			';
-	
-			wp_add_inline_style('blocktree-styles', $inlineCss);
-		}
 	}
 
 	public function blocktree_render_callback( $attr ) {
 
-		$this->backgroundColor = $attr['linkBgColor'];
-		$this->textColor = $attr['linkTextColor'];
-
 		$linkTarget = (bool) $attr['linkTarget'] ? 'target="_blank" rel="noopener noreferrer"' : '';
-		$html = '<div class="blocktree-link-item">';
+		$html = '<div class="blocktree-link-item blocktree-link-item-' . $this->item . '">';
 		$html .= '<a href="'.$attr['linkUrl'].'"'.$linkTarget.'>'.$attr['linkTitle'].'</a>';
 		$html .= '</div>';
 
 		return $html;
 	}
+
+	// public function blocktree_late_styles() {
+	// 	$cssInline = '
+	// 	<style type="text/css">
+	// 	.blocktree-link-item-' . $this->item . ' > a,
+	// 	.blocktree-link-item-' . $this->item . ' > a:focus {
+	// 		background-color: ' . $attr['linkBgColor'] . ' !important,
+	// 		color: ' . $attr['linkTextColor'] . ' !important,
+	// 	}
+	// 	</style>
+	// 	';
+	// }
 
 	private function dd( $content ) {
 		echo '<pre>';
